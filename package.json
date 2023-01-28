@@ -1,6 +1,6 @@
 {
   "name": "msgs-map-creator",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Make messages by plain text.",
   "main": "get-value.mjs",
   "types": "get-value.d.ts",
@@ -29,7 +29,7 @@
     "dev": "tsx src/index.ts",
     "test": "tsx src/get-value.ts",
     "build": "rm -rf dist && tsup --dts --format cjs,esm",
-    "publish": "mv dist/* . && npm publish && mv index.* dist && mv get-value.* dist;"
+    "publish": "cp dist/* . && npm publish && rm get-value.* && rm index.*"
   },
   "repository": {
     "type": "git",

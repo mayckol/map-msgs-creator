@@ -6,7 +6,7 @@ import { createHash } from './messages/message-factory';
 import { HashTypes } from './types';
 
 export type valueByText = (text: string) => string;
-export const getValueByText: valueByText = (text: string): string => {
+export const getValue: valueByText = (text: string): string => {
   if (!text) {
     console.log('Please provide a key as a command line argument.');
     return '';
@@ -26,8 +26,6 @@ export const getValueByText: valueByText = (text: string): string => {
   }
   try {
     const hashedKey = createHash(hashType as HashTypes, text);
-    console.log({ hashedKey, text });
-
     const { outputMessages } = require(outputPath);
     if (!outputMessages[hashedKey]) {
       console.log('The key is not valid');
@@ -39,6 +37,3 @@ export const getValueByText: valueByText = (text: string): string => {
     return '';
   }
 };
-getValueByText(
-  'Lorem Ipsum is simply dummy text of the printing and typesetting industry'
-);
