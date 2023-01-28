@@ -1,0 +1,70 @@
+{
+  "name": "msgs-map-creator",
+  "version": "1.0.0",
+  "description": "Make messages by plain text.",
+  "main": "get-value.mjs",
+  "types": "get-value.d.ts",
+  "files": [
+    "index.mjs",
+    "get-value.mjs",
+    "get-value.d.ts",
+    "README.md",
+    "package.json"
+  ],
+  "tsup": {
+    "entry": [
+      "src/index.ts",
+      "src/get-value.ts"
+    ],
+    "splitting": false,
+    "sourcemap": false,
+    "clean": true
+  },
+  "bin": {
+    "msgs-map-creator": "index.mjs"
+  },
+  "scripts": {
+    "make": "index.mjs",
+    "clear-cache": "rm -rf .config",
+    "dev": "tsx src/index.ts",
+    "test": "tsx src/get-value.ts",
+    "build": "rm -rf dist && tsup --dts --format cjs,esm",
+    "publish": "mv dist/* . && npm publish && mv index.* dist && mv get-value.* dist;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayckol/msgs-map-creator.git"
+  },
+  "keywords": [
+    "compose",
+    "messages",
+    "custom",
+    "key",
+    "file"
+  ],
+  "author": "Mayckol Rezende",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mayckol/msgs-map-creator/issues"
+  },
+  "homepage": "https://github.com/mayckol/msgs-map-creator#readme",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "commander": "^10.0.0",
+    "crypto-js": "^4.1.1",
+    "figlet": "^1.5.2",
+    "fs": "^0.0.1-security",
+    "tsup": "^6.5.0",
+    "tsx": "^3.12.2",
+    "typescript": "^4.9.4"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.5",
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "8.32.0",
+    "prettier": "2.8.3"
+  }
+}

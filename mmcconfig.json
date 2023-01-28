@@ -1,0 +1,7 @@
+{
+  "inputPath": "/tmp/foo.json",
+  "outputPath": "/tmp/foo.ts",
+  "headerDescription": "This file is auto-generated. Do not edit.",
+  "prettyOutput": "true",
+  "hashType": "md5"
+}
