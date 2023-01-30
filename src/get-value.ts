@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import * as fs from 'fs';
 import { CONFIG_CACHE_PATH } from './constants';
 import { createHash } from './messages/message-factory';
@@ -22,7 +21,7 @@ export const getValue: valueByText = (text: string): string => {
     console.error(
       `Error reading or parsing file at ${CONFIG_CACHE_PATH}: ${err}`
     );
-    console.log(chalk.red('Please run the command with the --init flag first'));
+    console.log('Please run the command with the --init flag first');
     return '';
   }
   try {
@@ -33,7 +32,7 @@ export const getValue: valueByText = (text: string): string => {
         return message[hashedKey];
       }
     }
-    console.log(chalk.red(`No value found for key ${text}`));
+    console.log(`No value found for key ${text}`);
     return '';
   } catch (err) {
     console.error(`Error reading or parsing file at ${path}: ${err}`);
