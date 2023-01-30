@@ -41,7 +41,7 @@ const checkInputPath = async (
 };
 
 const getOutputPath = (rl: readline.Interface): Promise<string> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     rl.question(
       chalk.white('Enter the output file absolute path like:\n') +
         chalk.grey(
@@ -70,6 +70,32 @@ const getHeaderDescription = (rl: readline.Interface): Promise<string> => {
           headerDescription = 'This file is auto-generated. Do not edit.';
         }
         resolve(headerDescription);
+      }
+    );
+  });
+};
+
+const getChosenLanguage = (
+  rl: readline.Interface,
+  filePaths: IFilePaths[]
+): Promise<string> => {
+  return new Promise((resolve) => {
+    console.log('Please select the desired language from the list below:\n');
+    for (let i = 0; i < filePaths.length; i++) {
+      console.log(`${i + 1}) ${filePaths[i].outputPath}`);
+    }
+    rl.question(
+      chalk.yellow('\nEnter the number of the option: \n'),
+      (option: string) => {
+        const index = parseInt(option, 10) - 1;
+        if (index >= 0 && index < filePaths.length) {
+          resolve(filePaths[index].outputPath);
+        } else {
+          console.error(chalk.red('Invalid option selected.\n'));
+          getChosenLanguage(rl, filePaths).then((chosenLang) =>
+            resolve(chosenLang)
+          );
+        }
       }
     );
   });
@@ -143,11 +169,18 @@ const getUserEntries = async (
       await askForMore();
     }
   }
+  const chosenLanguage = await getChosenLanguage(rl, filePaths);
 
   const headerDescription = await getHeaderDescription(rl);
   const hashType = await getHashType(rl);
   const prettyOutput = (await getPrettyOutput(rl)) === 'y' ? true : false;
 
-  return { headerDescription, hashType, prettyOutput, filePaths };
+  return {
+    headerDescription,
+    hashType,
+    prettyOutput,
+    filePaths,
+    chosenLanguage,
+  };
 };
 export { getUserEntries };

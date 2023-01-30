@@ -3,20 +3,22 @@ import * as fs from 'fs';
 import { CONFIG_CACHE_PATH } from './constants';
 import { createHash } from './messages/message-factory';
 
-import { HashTypes } from './types';
+import { HashTypes, IDefaultConfig } from './types';
 
-export type valueByText = (text: string) => string;
-export const getValue: valueByText = (text: string): string => {
+export type valueByText = (text: string, lang: string) => string;
+export const getValue: valueByText = (
+  text: string,
+  langDefaultPath: string
+): string => {
   if (!text) {
     console.log('Please provide a key as a command line argument.');
     return '';
   }
-  let { hashType, outputPath } = { hashType: '', outputPath: '' };
+  let { hashType } = { hashType: '' };
   try {
     const data = fs.readFileSync(CONFIG_CACHE_PATH, 'utf8');
-    const config = JSON.parse(data);
+    const config = JSON.parse(data) as IDefaultConfig;
     hashType = config.hashType;
-    outputPath = config.outputPath;
   } catch (err) {
     console.error(
       `Error reading or parsing file at ${CONFIG_CACHE_PATH}: ${err}`
@@ -26,14 +28,19 @@ export const getValue: valueByText = (text: string): string => {
   }
   try {
     const hashedKey = createHash(hashType as HashTypes, text);
-    const { outputMessages } = require(outputPath);
-    if (!outputMessages[hashedKey]) {
-      console.log('The key is not valid');
-      return '';
+    const { outputMessages } = require(langDefaultPath);
+    for (const message of outputMessages) {
+      if (message[hashedKey]) {
+        return message[hashedKey];
+      }
     }
-    return outputMessages[hashedKey];
+    throw new Error("Couldn't find the key in the file.");
   } catch (err) {
-    console.error(`Error reading or parsing file at ${outputPath}: ${err}`);
+    console.error(
+      `Error reading or parsing file at ${langDefaultPath}: ${err}`
+    );
     return '';
   }
 };
+
+console.log(getValue('video11', '/tmp/en-us.ts'));

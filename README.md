@@ -25,26 +25,28 @@ The mmcconfig.json file consists of the following properties:
 - `prettyOutput`: A boolean that specifies whether to format the output file in a readable manner or not. If set to true, the output file will be formatted in a readable manner, and if set to false, the output file will not be formatted.
 
 - `hashType`: A string that specifies the type of hash to be used in your project. This property can be set to one of the following values: "md5", "sha1", "sha256", "sha512".
+- `chosenLanguage`: The lang path to get the value from the key.
 
 ```json
 {
   "filePaths": [
     {
-      "inputPath": "/tmp/pt-br.json",
-      "outputPath": "/tmp/pt-br.ts"
+      "inputPath": "/tmp/es.json",
+      "outputPath": "/tmp/es.ts"
     },
     {
       "inputPath": "/tmp/en-us.json",
       "outputPath": "/tmp/en-us.ts"
     },
     {
-      "inputPath": "/tmp/es.json",
-      "outputPath": "/tmp/es.ts"
+      "inputPath": "/tmp/pt-br.json",
+      "outputPath": "/tmp/pt-br.ts"
     }
   ],
   "headerDescription": "This file is auto-generated. Do not edit.",
   "prettyOutput": true,
-  "hashType": "md5"
+  "hashType": "md5",
+  "chosenLanguage": "/tmp/en-us.ts"
 }
 ```
 

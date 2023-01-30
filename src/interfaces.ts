@@ -34,6 +34,7 @@ interface IDefaultConfig {
   hashType: HashTypes;
   prettyOutput: boolean;
   filePaths: IFilePaths[];
+  chosenLanguage?: string;
 }
 
 interface Argv {
@@ -48,6 +49,7 @@ interface IMessageInterface {
   outgoingMessages?: IOutgoingFileMessages;
   filePaths: IFilePaths[];
   incomingMessages: IOutgoingFileMessages;
+  chosenLanguage?: string;
 }
 
 interface IMessageActions {

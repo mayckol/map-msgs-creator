@@ -14,6 +14,7 @@ import { HashTypes } from '../types';
 
 abstract class MessageAbstract implements IMessageInterface, IMessageActions {
   filePaths: IFilePaths[];
+  chosenLanguage: string;
   headerDescription: string;
   prettyOutput: boolean;
   outgoingMessages: IOutgoingFileMessages;
@@ -41,6 +42,7 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
     });
     this.incomingMessages = {};
     this.warnings = [];
+    this.chosenLanguage = '';
   }
 
   abstract boot(): Promise<void>;
@@ -125,6 +127,7 @@ export { outputMessages };`;
         headerDescription: this.headerDescription,
         prettyOutput: this.prettyOutput,
         hashType: this.hashType,
+        chosenLanguage: this.chosenLanguage,
       },
       null,
       2

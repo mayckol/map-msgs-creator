@@ -61,6 +61,10 @@ class UserStdinMessage extends MessageAbstract {
     }
   }
 
+  private setChosenLanguage(lang: string) {
+    this.chosenLanguage = lang;
+  }
+
   setIncomingMessages() {
     try {
       this.filePaths.forEach(({ inputPath, outputPath }) => {
@@ -79,6 +83,7 @@ class UserStdinMessage extends MessageAbstract {
     try {
       await this.getBuildOptions().then((config) => {
         this.setBuildOptions(config);
+        this.setChosenLanguage(String(config.chosenLanguage));
         this.setIncomingMessages();
         this.setOutgoingMessages();
         this.writeOutgoingMessages();
