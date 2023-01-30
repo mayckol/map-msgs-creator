@@ -12,23 +12,20 @@ const messageFactory = (type: MessageBuildTypes): MessageAbstract => {
   switch (type) {
     case 'USER_CONF_CACHE':
       return new CachedConfMessage({
-        inputPath: '',
-        outputPath: '',
         headerDescription: '',
         prettyOutput: false,
-        incomingMessages: [],
+        filePaths: [],
         outgoingMessages: {},
         hashType: 'md5',
       });
     case 'USER_STDIN':
       return new UserStdinMessage({
-        inputPath: '',
-        outputPath: '',
         headerDescription: '',
         prettyOutput: false,
-        incomingMessages: [],
         outgoingMessages: {},
         hashType: 'md5',
+        filePaths: [],
+        incomingMessages: {},
       });
     default:
       throw new Error("Message type doesn't exist");

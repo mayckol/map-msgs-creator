@@ -1,7 +1,11 @@
 {
-  "inputPath": "/tmp/foo.json",
-  "outputPath": "/tmp/foo.ts",
+  "filePaths": [
+    {
+      "inputPath": "/tmp/pt-br.json",
+      "outputPath": "/tmp/pt-br.ts"
+    }
+  ],
   "headerDescription": "This file is auto-generated. Do not edit.",
-  "prettyOutput": "true",
+  "prettyOutput": true,
   "hashType": "md5"
 }

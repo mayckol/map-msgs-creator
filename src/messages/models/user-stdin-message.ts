@@ -4,27 +4,26 @@ import { CONFIG_CACHE_PATH } from '../../constants';
 import { getUserEntries } from '../../user-input';
 import { MessageAbstract } from '../message-abstract';
 import { IDefaultConfig, IMessageInterface } from '../../interfaces';
-import { getCachedConfig } from '../message-factory';
+import { createHash, getCachedConfig } from '../message-factory';
 import { ExceptionChangeInputType } from '../../types';
+import chalk from 'chalk';
 
 class UserStdinMessage extends MessageAbstract {
   constructor({
-    inputPath,
-    outputPath,
+    filePaths,
     headerDescription,
     prettyOutput,
-    incomingMessages,
     outgoingMessages,
     hashType,
+    incomingMessages,
   }: IMessageInterface) {
     super({
-      inputPath,
-      outputPath,
+      filePaths,
       headerDescription,
       prettyOutput,
-      incomingMessages,
       outgoingMessages,
       hashType,
+      incomingMessages,
     });
   }
 
@@ -33,7 +32,7 @@ class UserStdinMessage extends MessageAbstract {
       if (fs.existsSync(CONFIG_CACHE_PATH)) {
         const config = getCachedConfig();
         let answer = 'n';
-        if (config.inputPath || config.outputPath || config.headerDescription) {
+        if (config.filePaths.length > 0) {
           console.log(`A configuration file was found.\n`);
           console.log(getCachedConfig());
           console.log('\n');
@@ -66,11 +65,15 @@ class UserStdinMessage extends MessageAbstract {
 
   setIncomingMessages() {
     try {
-      this.incomingMessages = JSON.parse(
-        fs.readFileSync(this.inputPath, 'utf8')
-      );
+      this.filePaths.forEach(({ inputPath, outputPath }) => {
+        const path =
+          this.normalizePath(inputPath) + '@' + this.normalizePath(outputPath);
+        this.incomingMessages[path] = JSON.parse(
+          fs.readFileSync(inputPath, 'utf8')
+        );
+      });
     } catch (error) {
-      console.log('Error: ', error);
+      console.log(chalk.red(error));
     }
   }
 
@@ -85,7 +88,7 @@ class UserStdinMessage extends MessageAbstract {
         this.endProcess();
       });
     } catch (error) {
-      const { type, config } = error as ExceptionChangeInputType;
+      const { type } = error as ExceptionChangeInputType;
       if (type === 'user-cache') {
         this.setBuildOptions(getCachedConfig());
         this.setIncomingMessages();

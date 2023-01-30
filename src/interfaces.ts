@@ -5,8 +5,12 @@ interface IIncomingFileMessages {
   output: string;
 }
 
-interface IOutgoingFileMessages extends Record<string, string> {
+interface IOutgoingMessages {
   [key: string]: string;
+}
+
+interface IOutgoingFileMessages {
+  [key: string]: IOutgoingMessages[];
 }
 
 interface ICreator {
@@ -15,17 +19,21 @@ interface ICreator {
   outputPath: string;
   headerDescription?: string;
   prettyOutput?: boolean;
-  incomingMessages?: IIncomingFileMessages[];
+  incomingMessages?: IFilePaths[];
   outgoingMessages?: IOutgoingFileMessages;
   useCache?: boolean;
 }
 
-interface IDefaultConfig {
+interface IFilePaths {
   inputPath: string;
   outputPath: string;
+}
+
+interface IDefaultConfig {
   headerDescription: string;
   hashType: HashTypes;
   prettyOutput: boolean;
+  filePaths: IFilePaths[];
 }
 
 interface Argv {
@@ -34,17 +42,15 @@ interface Argv {
 }
 
 interface IMessageInterface {
-  inputPath: string;
-  outputPath: string;
   headerDescription?: string;
   prettyOutput?: boolean;
   hashType: HashTypes;
-  incomingMessages?: IIncomingFileMessages[];
   outgoingMessages?: IOutgoingFileMessages;
+  filePaths: IFilePaths[];
+  incomingMessages: IOutgoingFileMessages;
 }
 
 interface IMessageActions {
-  setIncomingMessages(): void;
   setOutgoingMessages(): void;
   getBuildOptions(): Promise<IDefaultConfig>;
   handleError(error: any): void;
@@ -56,7 +62,8 @@ export {
   IMessageActions,
   ICreator,
   IDefaultConfig,
+  IFilePaths,
   Argv,
-  IIncomingFileMessages,
   IOutgoingFileMessages,
+  IIncomingFileMessages,
 };

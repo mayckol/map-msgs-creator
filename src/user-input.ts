@@ -3,18 +3,28 @@ import * as path from 'path';
 import * as readline from 'readline';
 import chalk from 'chalk';
 import { IDefaultConfig } from './interfaces';
-import { HashTypes } from './types';
+import { HashTypes, IFilePaths } from './types';
 
-const getInputPath = (rl: readline.Interface): Promise<string> => {
-  return new Promise((resolve, reject) => {
+const getInputPath = async (rl: readline.Interface): Promise<string> => {
+  return new Promise(async (resolve, reject) => {
     rl.question(
-      chalk.yellow(
-        'Enter the input file absolute path like:\n/Users/CoreyTaylor/Development/awesome-project/src/i18n/input.json (the extension is optional).\n'
-      ),
-      (inputPath: string) => {
-        fs.access(inputPath, fs.constants.F_OK, (err) => {
+      chalk.white('Enter the input file (ABSOLUTE PATH) like:\n') +
+        chalk.grey(
+          '/EntirePath/en-custom.json (the extension name from the file is optional but the file needs to be a .json).\n'
+        ),
+      async (inputPath: string) => {
+        while (!inputPath) {
+          console.error(chalk.red('The file path is required.\n'));
+          inputPath = await getInputPath(rl);
+        }
+        if (!inputPath.endsWith('.json')) {
+          inputPath = inputPath + '.json';
+        }
+        fs.access(inputPath, fs.constants.F_OK, async (err) => {
           if (err) {
-            reject(new Error(`The file ${inputPath} does not exist.\n`));
+            console.error(chalk.red(`The file ${inputPath} does not exist.\n`));
+            inputPath = await getInputPath(rl);
+            return;
           }
           resolve(inputPath);
         });
@@ -23,16 +33,18 @@ const getInputPath = (rl: readline.Interface): Promise<string> => {
   });
 };
 
-const getOutputPath = (rl: readline.Interface): Promise<string> => {
-  return new Promise((resolve, reject) => {
+const getOutputPath = async (rl: readline.Interface): Promise<string> => {
+  return new Promise(async (resolve, reject) => {
     rl.question(
-      chalk.yellow(
-        'Enter the output file absolute path\n/Users/CoreyTaylor/Development/awesome-project/src/i18n/output.(ts/js) (the extension is required).\n'
-      ),
-      (outputPath: string) => {
+      chalk.white('Enter the output file absolute path like:\n') +
+        chalk.grey(
+          'Enter the output file absolute path\n/EntirePath/en-custom.(ts/js) (the extension is required).\n'
+        ),
+      async (outputPath: string) => {
         const dir = path.dirname(outputPath);
         if (!fs.existsSync(dir)) {
-          reject(new Error(`The directory ${dir} does not exist \n`));
+          console.error(chalk.red(`The directory ${dir} does not exist \n`));
+          return await getOutputPath(rl);
         }
         resolve(outputPath);
       }
@@ -91,12 +103,44 @@ const getHashType = (rl: readline.Interface): Promise<HashTypes> => {
 const getUserEntries = async (
   rl: readline.Interface
 ): Promise<IDefaultConfig> => {
-  const inputPath = await getInputPath(rl);
-  const outputPath = await getOutputPath(rl);
+  let filePaths: IFilePaths[] = [];
+  let keepAdding = true;
+
+  const askForMore = (): Promise<void> => {
+    return new Promise((resolve) => {
+      rl.question(
+        chalk.yellow('Do you want to add more input/output paths? (y/n)\n'),
+        (answer: string) => {
+          keepAdding = answer === 'y';
+          resolve();
+        }
+      );
+    });
+  };
+
+  const isPathAlreadySent = (inputPath: string, outputPath: string) => {
+    return filePaths.some(
+      (filePath) =>
+        filePath.inputPath === inputPath && filePath.outputPath === outputPath
+    );
+  };
+
+  while (keepAdding) {
+    const inputPath = await getInputPath(rl);
+    const outputPath = await getOutputPath(rl);
+    const pathExists = isPathAlreadySent(inputPath, outputPath);
+    if (pathExists) {
+      console.log(chalk.red('This input/output path was already set!\n'));
+    } else {
+      filePaths.push({ inputPath, outputPath });
+      await askForMore();
+    }
+  }
+
   const headerDescription = await getHeaderDescription(rl);
   const hashType = await getHashType(rl);
   const prettyOutput = (await getPrettyOutput(rl)) === 'y' ? true : false;
-  return { inputPath, outputPath, headerDescription, hashType, prettyOutput };
-};
 
+  return { headerDescription, hashType, prettyOutput, filePaths };
+};
 export { getUserEntries };

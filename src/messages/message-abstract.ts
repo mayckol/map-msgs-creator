@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import {
   IDefaultConfig,
-  IIncomingFileMessages,
+  IFilePaths,
   IMessageActions,
   IMessageInterface,
   IOutgoingFileMessages,
@@ -10,31 +10,28 @@ import {
 import { CONFIG_CACHE_PATH } from '../constants';
 import chalk from 'chalk';
 import { createHash, getCachedConfig } from './message-factory';
-import { HashTypes } from '../types';
+import { HashTypes, IIncomingFileMessages } from '../types';
 
 abstract class MessageAbstract implements IMessageInterface, IMessageActions {
-  inputPath: string;
-  outputPath: string;
+  filePaths: IFilePaths[];
   headerDescription: string;
   prettyOutput: boolean;
-  incomingMessages: IIncomingFileMessages[];
   outgoingMessages: IOutgoingFileMessages;
   defaultConf: IDefaultConfig;
   hashType: HashTypes;
   readonly rl: readline.Interface;
+  incomingMessages: IOutgoingFileMessages;
   warnings: string[] = [];
 
   constructor({
-    inputPath,
-    outputPath,
     headerDescription = 'This file is auto-generated. Do not edit.',
     prettyOutput = false,
+    filePaths,
   }: IMessageInterface) {
-    this.inputPath = inputPath;
-    this.outputPath = outputPath;
+    this.filePaths = filePaths;
     this.headerDescription = headerDescription;
     this.prettyOutput = prettyOutput;
-    this.incomingMessages = [];
+    this.filePaths = [];
     this.outgoingMessages = {};
     this.hashType = 'md5';
     this.defaultConf = this.getDefaults();
@@ -42,10 +39,9 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
       input: process.stdin,
       output: process.stdout,
     });
+    this.incomingMessages = {};
     this.warnings = [];
   }
-
-  abstract setIncomingMessages(): void;
 
   abstract boot(): Promise<void>;
 
@@ -60,21 +56,29 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
         new Date().toLocaleTimeString(),
       prettyOutput: false,
       hashType: this.hashType,
+      filePaths: this.filePaths,
     };
   }
 
   setBuildOptions(buildOptions: IDefaultConfig) {
-    if (!buildOptions?.inputPath) {
-      console.log('Error: input path is not defined.');
+    if (!buildOptions?.filePaths?.length) {
+      console.log('Error: No file paths provided.');
       return;
     }
-    const { inputPath, outputPath, headerDescription, prettyOutput, hashType } =
+    const { filePaths, headerDescription, prettyOutput, hashType } =
       buildOptions;
-    this.inputPath = inputPath;
-    this.outputPath = outputPath;
     this.headerDescription = headerDescription;
     this.prettyOutput = prettyOutput;
     this.hashType = hashType;
+    this.filePaths = filePaths;
+  }
+
+  normalizePath(path: string): string {
+    return encodeURIComponent(path.replace(/[\/\\]+/g, '_'));
+  }
+
+  recoverPath(key: string): string {
+    return decodeURIComponent(key).replace(/_/g, '/');
   }
 
   handleError(error: any) {
@@ -84,12 +88,14 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
   }
 
   setOutgoingMessages() {
-    if (!this.incomingMessages) {
-      return;
-    }
-    this.incomingMessages.forEach(({ input, output }) => {
-      const hash = this.setHash(input);
-      this.outgoingMessages[hash] = output;
+    Object.keys(this.incomingMessages).forEach((path) => {
+      const [, outputPath] = path.split('@');
+      this.outgoingMessages[outputPath] =
+        this.outgoingMessages[outputPath] || [];
+      this.incomingMessages[path].forEach(({ input, output }) => {
+        const hashKey = createHash(this.hashType, input);
+        this.outgoingMessages[outputPath].push({ [hashKey]: output });
+      });
     });
   }
 
@@ -97,40 +103,41 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
     if (!this.outgoingMessages || !Object.keys(this.outgoingMessages).length) {
       return;
     }
-    const outputMessages = this.prettyOutput
-      ? JSON.stringify(this.outgoingMessages, null, 2)
-      : JSON.stringify(this.outgoingMessages);
-    const contentFile = `// ${this.headerDescription}
+    let contentFile = '';
+    Object.keys(this.outgoingMessages).forEach((path) => {
+      const outputMessages = this.prettyOutput
+        ? JSON.stringify(this.outgoingMessages[path], null, 2)
+        : JSON.stringify(this.outgoingMessages[path]);
+      contentFile = `// ${this.headerDescription}
 // Last updated: ${new Date().toLocaleTimeString()}
   
 const outputMessages = ${outputMessages};\n
 export { outputMessages };`;
 
-    fs.writeFileSync(this.outputPath, contentFile);
+      fs.writeFileSync(this.recoverPath(path), contentFile);
+    });
   }
 
   protected writeCacheFile() {
-    const contentFile = `{
-  "inputPath": "${this.inputPath}",
-  "outputPath": "${this.outputPath}",
-  "headerDescription": "${this.headerDescription}",
-  "prettyOutput": "${this.prettyOutput}",
-  "hashType": "${this.hashType}"
-}`;
+    const contentFile = JSON.stringify(
+      {
+        filePaths: this.filePaths,
+        headerDescription: this.headerDescription,
+        prettyOutput: this.prettyOutput,
+        hashType: this.hashType,
+      },
+      null,
+      2
+    );
     fs.writeFileSync(CONFIG_CACHE_PATH, contentFile);
-  }
-  private setHash(key: string): string {
-    if (!key) {
-      console.log('Please provide a key as a command line argument.');
-      return '';
-    }
-    return createHash(this.hashType, key);
   }
 
   endProcess(): void {
+    const outputPaths = getCachedConfig()
+      ? this.filePaths.map(({ outputPath }) => outputPath).join(', ')
+      : '';
     console.log(
-      chalk.blueBright('\nThe file was created successfully: ') +
-        getCachedConfig()?.outputPath
+      chalk.blueBright('\nThe file was created successfully: ') + outputPaths
     );
     if (this.warnings.length) {
       console.log(chalk.yellow('\nThe process ended with warnings: '));

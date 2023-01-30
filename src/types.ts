@@ -1,6 +1,6 @@
 import {
   IDefaultConfig,
-  IIncomingFileMessages,
+  IFilePaths,
   IOutgoingFileMessages,
 } from './interfaces';
 
@@ -20,11 +20,9 @@ type MessageBuildTypes = ObjectValues<typeof MESSAGE_BUILD_TYPES>;
 type HashTypes = ObjectValues<typeof HASH_TYPES>;
 
 interface IMessage {
-  inputPath: string;
-  outputPath: string;
   headerDescription?: string;
   prettyOutput?: boolean;
-  incomingMessages?: IIncomingFileMessages[];
+  incomingMessages?: IFilePaths[];
   outgoingMessages?: IOutgoingFileMessages;
 }
 

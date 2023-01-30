@@ -25,7 +25,7 @@
   },
   "scripts": {
     "make": "index.mjs",
-    "clear-cache": "rm -rf .config",
+    "clear-cache": "rm -rf mmcconfig.json",
     "dev": "tsx src/index.ts",
     "test": "tsx src/get-value.ts",
     "build": "rm -rf dist && tsup --dts --format cjs,esm",

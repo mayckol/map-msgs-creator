@@ -7,22 +7,20 @@ import { getCachedConfig } from '../message-factory';
 
 class CachedConfMessage extends MessageAbstract {
   constructor({
-    inputPath,
-    outputPath,
     headerDescription,
     prettyOutput,
     incomingMessages,
     outgoingMessages,
     hashType,
+    filePaths,
   }: IMessageInterface) {
     super({
-      inputPath,
-      outputPath,
       headerDescription,
       prettyOutput,
       incomingMessages,
       outgoingMessages,
       hashType,
+      filePaths,
     });
   }
 
@@ -33,9 +31,14 @@ class CachedConfMessage extends MessageAbstract {
   setIncomingMessages() {
     try {
       this.defaultConf = getCachedConfig();
-      this.incomingMessages = JSON.parse(
-        fs.readFileSync(this.inputPath, 'utf8')
-      );
+      this.filePaths = this.defaultConf.filePaths;
+      this.filePaths.forEach(({ inputPath, outputPath }) => {
+        const path =
+          this.normalizePath(inputPath) + '@' + this.normalizePath(outputPath);
+        this.incomingMessages[path] = JSON.parse(
+          fs.readFileSync(inputPath, 'utf8')
+        );
+      });
     } catch (error) {
       console.log(chalk.red(error));
     }
