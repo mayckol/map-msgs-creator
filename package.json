@@ -1,6 +1,6 @@
 {
   "name": "msgs-map-creator",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Make messages by plain text.",
   "main": "get-value.mjs",
   "types": "get-value.d.ts",
@@ -60,7 +60,6 @@
     "commander": "^10.0.0",
     "crypto-js": "^4.1.1",
     "figlet": "^1.5.2",
-    "fs": "^0.0.1-security",
     "tsup": "^6.5.0",
     "tsx": "^3.12.2",
     "typescript": "^4.9.4"
