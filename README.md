@@ -61,6 +61,7 @@ npx msgs-map-creator
 The package accepts the following options:
 
 - `--keep-conf` or `-k`: Allows you to keep the previous configuration and use it for the current run.
+- `npx msgs-map-creator -- -k`
 
 ## Retrieving the value from the original text
 
