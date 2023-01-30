@@ -29,7 +29,8 @@
     "dev": "tsx src/index.ts",
     "test": "tsx src/get-value.ts",
     "build": "rm -rf dist && tsup --dts --format cjs,esm",
-    "publish": "cp dist/* . && npm publish && rm get-value.* && rm index.*"
+    "publish": "cp dist/* . && npm publish && rm get-value.* && rm index.*",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -65,6 +66,7 @@
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "eslint": "8.32.0",
+    "husky": "^8.0.3",
     "prettier": "2.8.3"
   }
 }
