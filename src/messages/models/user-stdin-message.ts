@@ -4,7 +4,7 @@ import { CONFIG_CACHE_PATH } from '../../constants';
 import { getUserEntries } from '../../user-input';
 import { MessageAbstract } from '../message-abstract';
 import { IDefaultConfig, IMessageInterface } from '../../interfaces';
-import { createHash, getCachedConfig } from '../message-factory';
+import { getCachedConfig } from '../message-factory';
 import { ExceptionChangeInputType } from '../../types';
 import chalk from 'chalk';
 
@@ -56,8 +56,6 @@ class UserStdinMessage extends MessageAbstract {
         }
       }
       return await getUserEntries(this.rl);
-    } catch (exception) {
-      throw exception;
     } finally {
       this.rl.close();
     }

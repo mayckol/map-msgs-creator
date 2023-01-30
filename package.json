@@ -11,6 +11,11 @@
     "README.md",
     "package.json"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "tsup": {
     "entry": [
       "src/index.ts",
@@ -30,7 +35,8 @@
     "test": "tsx src/get-value.ts",
     "build": "rm -rf dist && tsup --dts --format cjs,esm",
     "publish": "cp dist/* . && npm publish && rm get-value.* && rm index.*",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",

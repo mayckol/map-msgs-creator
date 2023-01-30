@@ -17,6 +17,7 @@ const messageFactory = (type: MessageBuildTypes): MessageAbstract => {
         filePaths: [],
         outgoingMessages: {},
         hashType: 'md5',
+        incomingMessages: {},
       });
     case 'USER_STDIN':
       return new UserStdinMessage({

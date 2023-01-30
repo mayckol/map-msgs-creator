@@ -6,45 +6,52 @@ import { IDefaultConfig } from './interfaces';
 import { HashTypes, IFilePaths } from './types';
 
 const getInputPath = async (rl: readline.Interface): Promise<string> => {
-  return new Promise(async (resolve, reject) => {
-    rl.question(
-      chalk.white('Enter the input file (ABSOLUTE PATH) like:\n') +
-        chalk.grey(
-          '/EntirePath/en-custom.json (the extension name from the file is optional but the file needs to be a .json).\n'
-        ),
-      async (inputPath: string) => {
-        while (!inputPath) {
-          console.error(chalk.red('The file path is required.\n'));
-          inputPath = await getInputPath(rl);
-        }
-        if (!inputPath.endsWith('.json')) {
-          inputPath = inputPath + '.json';
-        }
-        fs.access(inputPath, fs.constants.F_OK, async (err) => {
-          if (err) {
-            console.error(chalk.red(`The file ${inputPath} does not exist.\n`));
-            inputPath = await getInputPath(rl);
-            return;
-          }
-          resolve(inputPath);
-        });
-      }
-    );
+  return new Promise((resolve) => {
+    checkInputPath(rl, resolve);
   });
 };
 
-const getOutputPath = async (rl: readline.Interface): Promise<string> => {
-  return new Promise(async (resolve, reject) => {
+const checkInputPath = async (
+  rl: readline.Interface,
+  resolve: (value: string | PromiseLike<string>) => void
+) => {
+  rl.question(
+    chalk.white('Enter the input file (ABSOLUTE PATH) like:\n') +
+      chalk.grey(
+        '/EntirePath/en-custom.json (the extension name from the file is optional but the file needs to be a .json).\n'
+      ),
+    async (inputPath: string) => {
+      while (!inputPath) {
+        console.error(chalk.red('The file path is required.\n'));
+        inputPath = await getInputPath(rl);
+      }
+      if (!inputPath.endsWith('.json')) {
+        inputPath = inputPath + '.json';
+      }
+      fs.access(inputPath, fs.constants.F_OK, async (err) => {
+        if (err) {
+          console.error(chalk.red(`The file ${inputPath} does not exist.\n`));
+          inputPath = await getInputPath(rl);
+          return;
+        }
+        resolve(inputPath);
+      });
+    }
+  );
+};
+
+const getOutputPath = (rl: readline.Interface): Promise<string> => {
+  return new Promise((resolve, reject) => {
     rl.question(
       chalk.white('Enter the output file absolute path like:\n') +
         chalk.grey(
           'Enter the output file absolute path\n/EntirePath/en-custom.(ts/js) (the extension is required).\n'
         ),
-      async (outputPath: string) => {
+      (outputPath: string) => {
         const dir = path.dirname(outputPath);
         if (!fs.existsSync(dir)) {
           console.error(chalk.red(`The directory ${dir} does not exist \n`));
-          return await getOutputPath(rl);
+          return getOutputPath(rl);
         }
         resolve(outputPath);
       }
@@ -103,7 +110,7 @@ const getHashType = (rl: readline.Interface): Promise<HashTypes> => {
 const getUserEntries = async (
   rl: readline.Interface
 ): Promise<IDefaultConfig> => {
-  let filePaths: IFilePaths[] = [];
+  const filePaths: IFilePaths[] = [];
   let keepAdding = true;
 
   const askForMore = (): Promise<void> => {

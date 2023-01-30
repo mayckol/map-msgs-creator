@@ -10,7 +10,7 @@ import {
 import { CONFIG_CACHE_PATH } from '../constants';
 import chalk from 'chalk';
 import { createHash, getCachedConfig } from './message-factory';
-import { HashTypes, IIncomingFileMessages } from '../types';
+import { HashTypes } from '../types';
 
 abstract class MessageAbstract implements IMessageInterface, IMessageActions {
   filePaths: IFilePaths[];
