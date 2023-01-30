@@ -62,6 +62,15 @@ The package accepts the following options:
 
 - `--keep-conf` or `-k`: Allows you to keep the previous configuration and use it for the current run.
 
+## Retrieving the value from the original text
+
+```typescript
+import { getValue } from 'msgs-map-creator';
+console.log(getValue('original super text'));
+```
+
+The function will return the value according the config file (mmcconfig.json).
+
 ## Creating Custom Messages
 
 ### This topic explains the rule for creating customized messages from an original message.
