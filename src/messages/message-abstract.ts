@@ -110,7 +110,8 @@ abstract class MessageAbstract implements IMessageInterface, IMessageActions {
       const outputMessages = this.prettyOutput
         ? JSON.stringify(this.outgoingMessages[path], null, 2)
         : JSON.stringify(this.outgoingMessages[path]);
-      contentFile = `// ${this.headerDescription}
+      contentFile = `/* eslint-disable */
+// ${this.headerDescription}
 // Last updated: ${new Date().toLocaleTimeString()}
   
 const outputMessages = ${outputMessages};\n
