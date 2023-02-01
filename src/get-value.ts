@@ -16,10 +16,10 @@ export const getValue: valueByText = (text: string): string => {
     const data = fs.readFileSync(CONFIG_CACHE_PATH, 'utf8');
     const config = JSON.parse(data) as IDefaultConfig;
     hashType = config.hashType;
-    path = config.chosenLanguage || '';
+    path = config.chosenLanguagePath || '';
     if (!path) {
       console.log(
-        'Please verify your config file (mmcconfig.json) the chosenLanguage property is not set'
+        'Please verify your config file (mmcconfig.json) the chosenLanguagePath property is not set'
       );
       return '';
     }
