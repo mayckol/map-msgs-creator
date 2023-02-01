@@ -61,8 +61,8 @@ class UserStdinMessage extends MessageAbstract {
     }
   }
 
-  private setChosenLanguage(lang: string) {
-    this.chosenLanguage = lang;
+  private setchosenLanguagePath(lang: string) {
+    this.chosenLanguagePath = lang;
   }
 
   setIncomingMessages() {
@@ -83,7 +83,7 @@ class UserStdinMessage extends MessageAbstract {
     try {
       await this.getBuildOptions().then((config) => {
         this.setBuildOptions(config);
-        this.setChosenLanguage(String(config.chosenLanguage));
+        this.setchosenLanguagePath(String(config.chosenLanguagePath));
         this.setIncomingMessages();
         this.setOutgoingMessages();
         this.writeOutgoingMessages();

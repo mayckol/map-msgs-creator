@@ -1,12 +1,13 @@
 {
   "name": "msgs-map-creator",
-  "version": "1.1.6",
+  "version": "1.2.1",
   "description": "Make messages by plain text.",
-  "main": "get-value.js",
+  "main": "get-value.mjs",
   "types": "get-value.d.ts",
   "files": [
     "index.mjs",
     "get-value.js",
+    "get-value.mjs",
     "get-value.d.ts",
     "README.md",
     "package.json"

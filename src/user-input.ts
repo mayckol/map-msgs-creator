@@ -16,9 +16,9 @@ const checkInputPath = async (
   resolve: (value: string | PromiseLike<string>) => void
 ) => {
   rl.question(
-    chalk.white('Enter the input file (ABSOLUTE PATH) like:\n') +
+    chalk.white('Enter the input file (RELATIVE PATH) like:\n') +
       chalk.grey(
-        '/EntirePath/en-custom.json (the extension name from the file is optional but the file needs to be a .json).\n'
+        './input/en-custom.json (the extension name from the file is optional but the file needs to be a .json).\n'
       ),
     async (inputPath: string) => {
       while (!inputPath) {
@@ -28,14 +28,18 @@ const checkInputPath = async (
       if (!inputPath.endsWith('.json')) {
         inputPath = inputPath + '.json';
       }
-      fs.access(inputPath, fs.constants.F_OK, async (err) => {
-        if (err) {
-          console.error(chalk.red(`The file ${inputPath} does not exist.\n`));
-          inputPath = await getInputPath(rl);
-          return;
+      fs.access(
+        path.join(process.cwd(), inputPath),
+        fs.constants.F_OK,
+        async (err) => {
+          if (err) {
+            console.error(chalk.red(`The file ${inputPath} does not exist.\n`));
+            inputPath = await getInputPath(rl);
+            return;
+          }
+          resolve(inputPath);
         }
-        resolve(inputPath);
-      });
+      );
     }
   );
 };
@@ -43,12 +47,10 @@ const checkInputPath = async (
 const getOutputPath = (rl: readline.Interface): Promise<string> => {
   return new Promise((resolve) => {
     rl.question(
-      chalk.white('Enter the output file absolute path like:\n') +
-        chalk.grey(
-          'Enter the output file absolute path\n/EntirePath/en-custom.(ts/js) (the extension is required).\n'
-        ),
+      chalk.white('Enter the output file relative path like:\n') +
+        chalk.grey('./output/en-custom.(ts/js) (the extension is required).\n'),
       (outputPath: string) => {
-        const dir = path.dirname(outputPath);
+        const dir = path.dirname(path.join(process.cwd(), outputPath));
         if (!fs.existsSync(dir)) {
           console.error(chalk.red(`The directory ${dir} does not exist \n`));
           return getOutputPath(rl);
@@ -75,7 +77,7 @@ const getHeaderDescription = (rl: readline.Interface): Promise<string> => {
   });
 };
 
-const getChosenLanguage = (
+const getchosenLanguagePath = (
   rl: readline.Interface,
   filePaths: IFilePaths[]
 ): Promise<string> => {
@@ -92,9 +94,14 @@ const getChosenLanguage = (
           resolve(filePaths[index].outputPath);
         } else {
           console.error(chalk.red('Invalid option selected.\n'));
-          getChosenLanguage(rl, filePaths).then((chosenLang) =>
-            resolve(chosenLang)
-          );
+          getchosenLanguagePath(rl, filePaths).then((chosenLang) => {
+            const fileName = chosenLang
+              .split('/')
+              .pop()
+              ?.replace('.ts', '')
+              .replace('.js', '');
+            resolve(String(fileName));
+          });
         }
       }
     );
@@ -169,7 +176,7 @@ const getUserEntries = async (
       await askForMore();
     }
   }
-  const chosenLanguage = await getChosenLanguage(rl, filePaths);
+  const chosenLanguagePath = await getchosenLanguagePath(rl, filePaths);
 
   const headerDescription = await getHeaderDescription(rl);
   const hashType = await getHashType(rl);
@@ -180,7 +187,7 @@ const getUserEntries = async (
     hashType,
     prettyOutput,
     filePaths,
-    chosenLanguage,
+    chosenLanguagePath,
   };
 };
 export { getUserEntries };
