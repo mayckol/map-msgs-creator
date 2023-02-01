@@ -17,6 +17,12 @@ export const getValue: valueByText = (text: string): string => {
     const config = JSON.parse(data) as IDefaultConfig;
     hashType = config.hashType;
     path = config.chosenLanguage || '';
+    if (!path) {
+      console.log(
+        'Please verify your config file (mmcconfig.json) the chosenLanguage property is not set'
+      );
+      return '';
+    }
   } catch (err) {
     console.error(
       `Error reading or parsing file at ${CONFIG_CACHE_PATH}: ${err}`

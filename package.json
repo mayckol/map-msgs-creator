@@ -2,11 +2,11 @@
   "name": "msgs-map-creator",
   "version": "1.1.6",
   "description": "Make messages by plain text.",
-  "main": "get-value.mjs",
+  "main": "get-value.js",
   "types": "get-value.d.ts",
   "files": [
     "index.mjs",
-    "get-value.mjs",
+    "get-value.js",
     "get-value.d.ts",
     "README.md",
     "package.json"
@@ -17,10 +17,6 @@
     }
   },
   "tsup": {
-    "entry": [
-      "src/index.ts",
-      "src/get-value.ts"
-    ],
     "splitting": false,
     "sourcemap": false,
     "clean": true
@@ -33,7 +29,8 @@
     "clear-cache": "rm -rf mmcconfig.json",
     "dev": "tsx src/index.ts",
     "test": "tsx src/get-value.ts",
-    "build": "rm -rf dist && tsup --dts --format cjs,esm",
+    "test-build": "tsx dist/get-value.js",
+    "build": "rm -rf dist && tsup --entry src/get-value.ts --entry src/index.ts --dts --format cjs,esm",
     "publish": "cp dist/* . && npm publish && rm get-value.* && rm index.*",
     "prepare": "husky install",
     "lint": "eslint ."
